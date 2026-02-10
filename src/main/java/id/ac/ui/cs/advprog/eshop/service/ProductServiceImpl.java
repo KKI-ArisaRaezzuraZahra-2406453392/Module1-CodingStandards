@@ -37,4 +37,9 @@ public class ProductServiceImpl implements ProductService {
     public void update(String productId, Product product) {
         productRepository.update(productId, product);
     }
+
+    @Override
+    public void deleteProductById(String productId) {
+        productRepository.delete(productId);
+    }
 }
