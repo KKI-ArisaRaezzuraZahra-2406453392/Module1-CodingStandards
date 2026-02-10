@@ -15,4 +15,4 @@ One security improvement I applied was switching from manual or empty IDs to **U
 During the implementation of the `Edit` feature, I encountered a significant bug.
 
 * **The "Null ID" Mistake:** When I first implemented the edit page, it returned a `404` error. This happened because newly created products had a `null` ID, so the URL generated was `/product/edit/` (missing the ID parameter).
-* **The Fix:** I improved the `ProductRepository` by adding a UUID generator inside the `create` method. This ensures data integrity and prevents broken links in the application.
+* **The Fix:** I improved the `ProductController` by adding a check inside the `createProductPost` method: if the ID is null, a new UUID is generated. This ensures data integrity and prevents broken links in the application.
