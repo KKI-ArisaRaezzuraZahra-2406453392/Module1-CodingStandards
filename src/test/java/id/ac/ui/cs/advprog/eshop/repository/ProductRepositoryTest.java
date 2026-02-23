@@ -66,6 +66,35 @@ class ProductRepositoryTest {
     }
 
     @Test
+    void testFindByIdNotFound() {
+        Product result = productRepository.findById("random-id");
+        assertNull(result);
+    }
+
+    @Test
+    void testFindByIdAfterSkipping() {
+        Product first = new Product();
+        first.setProductId("id-1");
+        productRepository.create(first);
+
+        Product second = new Product();
+        second.setProductId("id-2");
+        productRepository.create(second);
+
+        Product result = productRepository.findById("id-2");
+        assertEquals("id-2", result.getProductId());
+    }
+
+    @Test
+    void testEditWithEmptyRepository() {
+        Product updatedProduct = new Product();
+        updatedProduct.setProductName("Sampo Cap Bambang");
+
+        Product result = productRepository.update("random-id", updatedProduct);
+        assertNull(result);
+    }
+
+    @Test
     void testEditProduct() {
         Product product = new Product();
         product.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");
@@ -81,6 +110,29 @@ class ProductRepositoryTest {
         Product result = productRepository.findById(product.getProductId());
         assertEquals("Sampo Cap Usep", result.getProductName());
         assertEquals(50, result.getProductQuantity());
+    }
+
+    void testEditProductAfterSkipping() {
+        Product product1 = new Product();
+        product1.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        product1.setProductName("Sampo Cap Bambang");
+        product1.setProductQuantity(100);
+        productRepository.create(product1);
+
+        Product product2 = new Product();
+        product2.setProductId("a0f9de46-90b1-437d-a0bf-d0821dde9096");
+        product2.setProductName("Sampo Cap Usep");
+        product2.setProductQuantity(50);
+        productRepository.create(product2);
+
+        Product updatedProduct = new Product();
+        updatedProduct.setProductName("Sampo Cap Cahyo");
+        updatedProduct.setProductQuantity(75);
+        productRepository.update(product2.getProductId(), updatedProduct);
+
+        Product result = productRepository.findById(product2.getProductId());
+        assertEquals("Sampo Cap Cahyo", result.getProductName());
+        assertEquals(75, result.getProductQuantity());
     }
 
     @Test
