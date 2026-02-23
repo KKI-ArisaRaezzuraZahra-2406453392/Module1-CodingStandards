@@ -2,6 +2,9 @@ name: Continuous Integration (CI)
 
 ## Run CI jobs on all branches by default
 on:
+  permissions:
+    contents: read
+
   push:
   pull_request:
 
