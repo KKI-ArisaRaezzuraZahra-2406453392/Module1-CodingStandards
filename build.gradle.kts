@@ -90,6 +90,11 @@ sonarqube {
         property("sonar.projectKey", "KKI-ArisaRaezzuraZahra-2406453392_Module1-CodingStandards")
         property("sonar.organization", "kki-arisaraezzurazahra-2406453392")
         property("sonar.host.url", "https://sonarcloud.io")
+
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java")
+        property("sonar.java.binaries", "build/classes/java/main")
+
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
