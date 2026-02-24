@@ -29,7 +29,7 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          session_token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
           application_name: 'eshop'
           environment_name: 'Eshop-env'
           version_label: ${{ github.sha }}
