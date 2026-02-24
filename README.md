@@ -1,3 +1,5 @@
+# Module 1
+
 ## Reflection 1
 
 ### Clean Code Principles Applied
@@ -29,3 +31,26 @@ If I were to create a new functional test suite to verify the number of items in
 * **Why it matters:** If the setup logic changes in the future (e.g., we switch from Chrome to Firefox, or the way the port is retrieved changes), I would have to manually update every single test class and the test class becomes cluttered with setup details that are not relevant to the specific test case (counting items), making it harder to focus on the actual testing logic.
 * **Suggested Improvements:** I would create a base class (e.g., `BaseFunctionalTest`) that handles the common setup procedures (Driver initialization, `baseUrl` configuration) which then both the `CreateProductFunctionalTest` and the new `ProductListFunctionalTest` would extend this base class.
 * **Result:** The specific test classes would only contain the logic relevant to their specific tasks (creating a product or counting items), keeping them clean, focused, and easy to maintain.
+---
+
+# Module 2
+
+## Deployment Link
+[Eshop-env.eba-ub3ivqhc.us-east-1.elasticbeanstalk.com](Eshop-env.eba-ub3ivqhc.us-east-1.elasticbeanstalk.com ) 
+
+## Reflection
+During the exercise, I identified and fixed several high and medium-severity issues detected by the OSSF Scorecard and GitHub Code Scanning.
+
+**Token-Permissions (High Severity)**
+- Issue: The GITHUB_TOKEN in the CI workflow was granted broad write permissions by default, which posed a security risk if the repository were compromised.
+- Strategy: I modified the .github/workflows/ci.yml file to include a top-level permissions block explicitly set to contents: read. This follows the principle of least privilege by restricting the token to read-only access.
+
+**Pinned-Dependencies (Medium Severity)**
+- Issue: Some dependency like actions/checkout, actions/setup-java, and codeql-action/upload-sarif were using version tags (e.g., @v4) instead of specific commit hashes. Tags can be moved, potentially introducing unverified code into the pipeline.
+- Strategy: I replaced the version tags with full-length SHA commit hashes. This ensures the exact same code is executed every time, protecting the build from "tag jumping" or supply-chain attacks.
+- Problem Encountered: While I successfully pinned the checkout and upload-sarif actions, attempting to pin setup-java to a specific SHA resulted in a 404 error during the workflow execution. This error indicated that GitHub could not find the specific tarball for the hash provided.
+- Final: To ensure the CI/CD pipeline remained functional and the application could successfully build and deploy to Render, I chose to keep the @v4 tag for setup-java while maintaining the SHA pins for other actions.
+
+**SonarCloud Coverage Reporting (0.0% Coverage)**
+- Issue: The initial analysis showed 0% coverage because the JaCoCo XML reports were not being generated or found.
+- Strategy: I updated the build.gradle.kts to explicitly enable XML report generation in the jacocoTestReport task and configured the sonarqube block to point to the correct file path.
