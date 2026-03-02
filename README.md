@@ -39,18 +39,28 @@ If I were to create a new functional test suite to verify the number of items in
 [Eshop-env.eba-ub3ivqhc.us-east-1.elasticbeanstalk.com](Eshop-env.eba-ub3ivqhc.us-east-1.elasticbeanstalk.com ) 
 
 ## Reflection
+
+### Code Quality Issue(s) and Strategy to Fix it
 During the exercise, I identified and fixed several high and medium-severity issues detected by the OSSF Scorecard and GitHub Code Scanning.
 
 **Token-Permissions (High Severity)**
-- Issue: The GITHUB_TOKEN in the CI workflow was granted broad write permissions by default, which posed a security risk if the repository were compromised.
-- Strategy: I modified the .github/workflows/ci.yml file to include a top-level permissions block explicitly set to contents: read. This follows the principle of least privilege by restricting the token to read-only access.
+- **Issue**: The GITHUB_TOKEN in the CI workflow was granted broad write permissions by default, which posed a security risk if the repository were compromised.
+- **Strategy**: I modified the .github/workflows/ci.yml file to include a top-level permissions block explicitly set to contents: read. This follows the principle of least privilege by restricting the token to read-only access.
 
 **Pinned-Dependencies (Medium Severity)**
-- Issue: Some dependency like actions/checkout, actions/setup-java, and codeql-action/upload-sarif were using version tags (e.g., @v4) instead of specific commit hashes. Tags can be moved, potentially introducing unverified code into the pipeline.
-- Strategy: I replaced the version tags with full-length SHA commit hashes. This ensures the exact same code is executed every time, protecting the build from "tag jumping" or supply-chain attacks.
-- Problem Encountered: While I successfully pinned the checkout and upload-sarif actions, attempting to pin setup-java to a specific SHA resulted in a 404 error during the workflow execution. This error indicated that GitHub could not find the specific tarball for the hash provided.
-- Final: To ensure the CI/CD pipeline remained functional and the application could successfully build and deploy to Render, I chose to keep the @v4 tag for setup-java while maintaining the SHA pins for other actions.
+- **Issue**: Some dependency like actions/checkout, actions/setup-java, and codeql-action/upload-sarif were using version tags (e.g., @v4) instead of specific commit hashes. Tags can be moved, potentially introducing unverified code into the pipeline.
+- **Strategy**: I replaced the version tags with full-length SHA commit hashes. This ensures the exact same code is executed every time, protecting the build from "tag jumping" or supply-chain attacks.
+- **Problem Encountered**: While I successfully pinned the checkout and upload-sarif actions, attempting to pin setup-java to a specific SHA resulted in a 404 error during the workflow execution. This error indicated that GitHub could not find the specific tarball for the hash provided.
+- **Final**: To ensure the CI/CD pipeline remained functional and the application could successfully build and deploy to Render, I chose to keep the @v4 tag for setup-java while maintaining the SHA pins for other actions.
 
 **SonarCloud Coverage Reporting (0.0% Coverage)**
-- Issue: The initial analysis showed 0% coverage because the JaCoCo XML reports were not being generated or found.
-- Strategy: I updated the build.gradle.kts to explicitly enable XML report generation in the jacocoTestReport task and configured the sonarqube block to point to the correct file path.
+- **Issue**: The initial analysis showed 0% coverage because the JaCoCo XML reports were not being generated or found.
+- **Strategy**: I updated the build.gradle.kts to explicitly enable XML report generation in the jacocoTestReport task and configured the SonarCloud block to point to the correct file path.
+
+### CI/CD Implementation
+
+The current implementation successfully meets the definitions of Continuous Integration (CI) and Continuous Deployment (CD).
+
+- First, the CI aspect is fulfilled because every push or pull request triggers an automated workflow that compiles the Java code, runs unit tests, and performs static analysis via SonarCloud to ensure code quality before merging. 
+- Second, the CD aspect is met through the integration with AWS Elastic Beanstalk, where the pipeline automatically packages the application into a JAR file and deploys it to the AWS environment whenever changes are pushed to the master branch.
+- Finally, this setup ensures a reliable release cycle because it maintains a high standard of quality through automated gates while providing a fully automated, hands-off path from a code commit to a live, publicly accessible URL on AWS.
