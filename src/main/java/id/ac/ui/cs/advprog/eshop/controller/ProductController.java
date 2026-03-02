@@ -2,7 +2,7 @@ package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Car;
 import id.ac.ui.cs.advprog.eshop.model.Product;
-import id.ac.ui.cs.advprog.eshop.service.CarServiceImpl;
+import id.ac.ui.cs.advprog.eshop.service.CarService;
 import id.ac.ui.cs.advprog.eshop.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +64,9 @@ public class ProductController {
 
 @Controller
 @RequestMapping("/car")
-public class CarController extends ProductController {
+class CarController extends ProductController {
     @Autowired
-    private CarServiceImpl carservice;
+    private CarService carservice;
 
     @GetMapping("/createCar")
     public String createCarPage(Model model) {
@@ -81,7 +81,7 @@ public class CarController extends ProductController {
             car.setCarId(UUID.randomUUID().toString());
         }
         carservice.create(car);
-        return "redirect:list";
+        return "redirect:listCar";
     }
 
     @GetMapping("/listCar")
@@ -92,7 +92,7 @@ public class CarController extends ProductController {
     }
 
     @GetMapping("/editCar/{carId}")
-    public String editCarPage(@PathVariable("carId") String carId, Model model) {
+    public String editCarPage(@PathVariable String carId, Model model) {
         Car car = carservice.findById(carId);
         model.addAttribute("car", car);
         return "EditCar";
@@ -108,6 +108,6 @@ public class CarController extends ProductController {
     @GetMapping("/deleteCar/{carId}")
     public String deleteCar(@PathVariable("carId") String carId) {
         carservice.deleteCarById(carId);
-        return "redirect:listCar";
+        return "redirect:../listCar";
     }
 }
