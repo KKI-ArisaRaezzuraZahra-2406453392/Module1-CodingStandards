@@ -31,6 +31,7 @@ If I were to create a new functional test suite to verify the number of items in
 * **Why it matters:** If the setup logic changes in the future (e.g., we switch from Chrome to Firefox, or the way the port is retrieved changes), I would have to manually update every single test class and the test class becomes cluttered with setup details that are not relevant to the specific test case (counting items), making it harder to focus on the actual testing logic.
 * **Suggested Improvements:** I would create a base class (e.g., `BaseFunctionalTest`) that handles the common setup procedures (Driver initialization, `baseUrl` configuration) which then both the `CreateProductFunctionalTest` and the new `ProductListFunctionalTest` would extend this base class.
 * **Result:** The specific test classes would only contain the logic relevant to their specific tasks (creating a product or counting items), keeping them clean, focused, and easy to maintain.
+
 ---
 
 # Module 2
@@ -58,9 +59,36 @@ During the exercise, I identified and fixed several high and medium-severity iss
 - **Strategy**: I updated the build.gradle.kts to explicitly enable XML report generation in the jacocoTestReport task and configured the SonarCloud block to point to the correct file path.
 
 ### CI/CD Implementation
-
 The current implementation successfully meets the definitions of Continuous Integration (CI) and Continuous Deployment (CD).
 
 - First, the CI aspect is fulfilled because every push or pull request triggers an automated workflow that compiles the Java code, runs unit tests, and performs static analysis via SonarCloud to ensure code quality before merging. 
 - Second, the CD aspect is met through the integration with AWS Elastic Beanstalk, where the pipeline automatically packages the application into a JAR file and deploys it to the AWS environment whenever changes are pushed to the master branch.
 - Finally, this setup ensures a reliable release cycle because it maintains a high standard of quality through automated gates while providing a fully automated, hands-off path from a code commit to a live, publicly accessible URL on AWS.
+
+---
+
+# Module 3
+
+## Explain what principles you apply to your project!
+In this project, I applied several SOLID principles to improve the maintainability and structure of the code:
+
+- **Single Responsibility Principle (SRP)**: I separated the CarController from the ProductController. Previously, ProductController was handling two different things (Products and Cars), by moving CarController into its own file, each class now has only one reason to change.
+- **Open-Closed Principle (OCP)**: I utilized the Service-Interface pattern by having CarController depend on the CarService interface. This makes the system open to new service implementations without needing to modify the existing controller code.
+- **Liskov Substitution Principle (LSP)**: I removed the inheritance where CarController extended ProductController. The original inheritance was inappropriate because a CarController is not a subtype of ProductController in a way that allows them to be substituted interchangeably without causing pathing issues and logic errors.
+- **Interface Segregation Principle (ISP)**: My project uses separate, specific interfaces for CarService and ProductService. This ensures that CarServiceImpl is only forced to implement methods it actually needs rather than being bloated with unrelated product logic.
+- **Dependency Inversion Principle (DIP)**: I ensured that the controllers depend on the CarService and ProductService interfaces rather than their concrete implementations (like CarServiceImpl). By autowiring the interface, the high-level web layer is decoupled from the specific low-level business logic implementation. 
+
+Note: DIP and ISP were largely structurally present during the debugging phase of the before-solid branch.
+
+## Explain the advantages of applying SOLID principles to your project with examples.
+- **Easier Debugging and Navigation (SRP)**: When I encountered the 404 error during the tutorial, having the Car logic isolated in its own CarController made it much easier identifying issues with specific routes like /car/listCar because the code isn't buried within unrelated product logic
+- **System Extensibility (OCP)**: Because the controller uses the CarService interface, if needed, I can later create a new version of the service and swap it in via Spring's dependency injection without touching the CarController code at all.
+- **Reduced Side Effects (LSP)**: By removing the inheritance between controllers, I eliminated the shadowed request mappings. This ensured that changes to the Product URLs would never accidentally overwrite or break the Car URLs.
+- **Leaner Implementations (ISP)**: Because the services are segregated, CarServiceImpl only needs to implement methods relevant to cars. If I need to add a car-specific feature like checkEngineStatus(), I can do so without polluting the Product logic.
+- **Flexibility (DIP)**: Because CarController only knows about the CarService interface, I can easily swap out the current CarServiceImpl for a different implementation (like a database-backed service or a mock service for testing) without changing any code in the controller.
+
+## Explain the disadvantages of not applying SOLID principles to your project with examples.
+- **Rigid and Fragile Code (Violation of SRP)**: If I had kept CarController inside ProductController, the file would eventually become a massive file that is hard to read. A small change to the Car feature could accidentally break the Product feature because they share the same class scope.
+- **High Maintenance Costs (Violation of OCP)**: Without OCP, adding a new type of service would require modifying the CarController to use if-else blocks to decide which service to call, increasing the risk of introducing new bugs into working code.
+- **Logical Confusion (Violation of LSP)**: Keeping the inheritance between the two controllers caused significant pathing confusion. This is a prime example of how improper inheritance makes the program behavior unpredictable and difficult to extend.
+- **Tight Coupling (Violation of ISP & DIP)**: Currently, while the Controller is decoupled from the Service, the CarServiceImpl still depends directly on the concrete CarRepository class. If I were to switch from an ArrayList to a SQL database, I would be forced to modify the CarServiceImpl code directly. This shows that while the code is improved, remaining tightly coupled at the repository level still limits full modularity.
