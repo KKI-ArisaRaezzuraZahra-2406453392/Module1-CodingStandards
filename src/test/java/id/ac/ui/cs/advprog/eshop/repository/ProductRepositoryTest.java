@@ -37,6 +37,24 @@ class ProductRepositoryTest {
     }
 
     @Test
+    void testCreateProductNoID() throws Exception {
+        ProductRepository productRepository = new ProductRepository();
+        Product product = new Product();
+        product.setProductName("Sampo Cap Usep");
+        product.setProductQuantity(50);
+        product.setProductId(null);
+
+        Product createdProduct = productRepository.create(product);
+
+        Iterator<Product> productIterator = productRepository.findAll();
+        assertTrue(productIterator.hasNext());
+
+        assertNotNull(createdProduct.getProductId());
+        assertFalse(createdProduct.getProductId().isEmpty());
+        assertEquals(product.getProductId(), createdProduct.getProductId());
+    }
+
+    @Test
     void testFindAllIfEmpty() {
         Iterator<Product> productIterator = productRepository.findAll();
         assertFalse(productIterator.hasNext());

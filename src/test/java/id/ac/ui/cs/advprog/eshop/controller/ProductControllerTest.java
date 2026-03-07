@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -53,24 +51,6 @@ class ProductControllerTest {
                 .andExpect(redirectedUrl("list"));
 
         verify(service, times(1)).create(any(Product.class));
-    }
-
-    @Test
-    void testCreateProductNoIDPost() throws Exception {
-        Product product2 = new Product();
-        product2.setProductName("Sampo Cap Usep");
-        product2.setProductQuantity(50);
-        product2.setProductId(null);
-
-        mockMvc.perform(post("/product/create")
-                        .flashAttr("product", product2))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("list"));
-
-        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
-        verify(service).create(productCaptor.capture());
-
-        assertNotNull(productCaptor.getValue().getProductId());
     }
 
     @Test
