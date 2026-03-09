@@ -92,3 +92,25 @@ Note: DIP and ISP were largely structurally present during the debugging phase o
 - **High Maintenance Costs (Violation of OCP)**: Without OCP, adding a new type of service would require modifying the CarController to use if-else blocks to decide which service to call, increasing the risk of introducing new bugs into working code.
 - **Logical Confusion (Violation of LSP)**: Keeping the inheritance between the two controllers caused significant pathing confusion. This is a prime example of how improper inheritance makes the program behavior unpredictable and difficult to extend.
 - **Tight Coupling (Violation of ISP & DIP)**: Currently, while the Controller is decoupled from the Service, the CarServiceImpl still depends directly on the concrete CarRepository class. If I were to switch from an ArrayList to a SQL database, I would be forced to modify the CarServiceImpl code directly. This shows that while the code is improved, remaining tightly coupled at the repository level still limits full modularity.
+
+---
+
+# Module 4
+
+## Tutorial Reflection 
+
+### Reflect whether this TDD flow is useful enough for you or not. 
+Applying the self-reflective questions by Percival (2017), I find the flow taught and used in the tutorial useful mainly for a few reasons such as:
+- **Correctness**: The [RED] phase helped me think and focus on both happy and unhappy paths, making me prepare for edge cases before writing the production code.
+- **Maintainability**: The [REFACTOR] phase moved the hardcoded strings to an enum, this allows me to modify the enum value without fear of breaking the app. The tests also help making sure the behavior remained identical and doesn't affect the functionality.
+- **Productive Workflow**: While preparing for the test might need extra planning and time, the immediate feedback it gave made building the production code easier and reduce the time spend on manual debugging.
+
+### Reflect whether your tests have successfully followed F.I.R.S.T. principle or not.
+I believe that my tests have followed the F.I.R.S.T. principle due to multiple reason:
+
+- **Fast**: Since the tests cover the unit-level, it doesn't need external database or other system to run. This allows the tests to give feedback almost instantaneously after being run.
+- **Isolated/Independent**: Using the `@BeforeEach` before every test make sure that the ArrayList of products are fresh for every test case. This ensures the state of each test doesn't interfere with the other.
+- **Repeatable**: Since every test use deterministic data and are isolated from each other, it'll produce similar results every time it's executed regardless of the environment.
+- **Self-Validating**: The tests use clear assertion with specific expected values, so there'll be no need to manual check since the test already show a pass or fail clearly.
+- **Timely/Thorough**: The tests were written before the production code and build it as more features are being introduced. It covers both the happy and unhappy path, taking account of the possible edge cases.
+
