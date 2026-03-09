@@ -67,7 +67,7 @@ class PaymentTest {
     }
 
     @Test
-    void testSetStatusToCancelled() {
+    void testSetStatusToFailed() {
         Payment payment = new Payment("first-payment-1", "VoucherCode",
                 "SUCCESS", this.paymentData);
 
