@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
+import id.ac.ui.cs.advprog.eshop.enums.PaymentStatus;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.model.Product;
@@ -44,10 +45,10 @@ class PaymentServiceImplTest {
 
         payments = new ArrayList<>();
         Payment payment1 = new Payment("first-payment-1", "VoucherCode",
-                "FAILED", paymentData);
+                PaymentStatus.REJECTED.getValue(), paymentData);
         payments.add(payment1);
         Payment payment2 = new Payment("first-payment-2", "VoucherCode",
-                "SUCCESS", paymentData);
+                PaymentStatus.SUCCESS.getValue(), paymentData);
         payments.add(payment2);
     }
 
@@ -61,7 +62,7 @@ class PaymentServiceImplTest {
         assertNotNull(result.getId());
         assertFalse(result.getId().isEmpty());
         assertEquals(payment.getMethod(), result.getMethod());
-        assertEquals("SUCCESS", result.getStatus());
+        assertEquals(PaymentStatus.SUCCESS.getValue(), result.getStatus());
     }
 
     @Test
@@ -72,10 +73,10 @@ class PaymentServiceImplTest {
         doReturn(payment).when(paymentRepository).findById(payment.getId());
         doReturn(newPayment).when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.setStatus(payment, "SUCCESS");
+        Payment result = paymentService.setStatus(payment, PaymentStatus.SUCCESS.getValue());
 
         assertEquals(payment.getId(), result.getId());
-        assertEquals("SUCCESS", result.getStatus());
+        assertEquals(PaymentStatus.SUCCESS.getValue(), result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
@@ -93,11 +94,11 @@ class PaymentServiceImplTest {
     @Test
     void testSetStatusInvalidPaymentId() {
         Payment payment = new Payment("invalid-id", "VoucherCode",
-                "FAILED", new HashMap<>());
+                PaymentStatus.REJECTED.getValue(), new HashMap<>());
         doReturn(null).when(paymentRepository).findById("invalid-id");
 
         assertThrows(NoSuchElementException.class, () ->
-                paymentService.setStatus(payment, "SUCCESS")) ;
+                paymentService.setStatus(payment, PaymentStatus.SUCCESS.getValue())) ;
 
         verify(paymentRepository, times(0)).save(any(Payment.class));
     }
