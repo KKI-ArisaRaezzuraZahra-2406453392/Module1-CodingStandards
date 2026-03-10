@@ -27,6 +27,10 @@ public class PaymentServiceImpl implements PaymentService {
             if (isValidVoucherCode(voucherCode)) {
                 status = PaymentStatus.SUCCESS.getValue();
             }
+        } else if (method.equals("BankTransfer")) {
+            if (isValidBankTransfer(paymentData)) {
+                status = PaymentStatus.SUCCESS.getValue();
+            }
         }
 
         Payment payment = new Payment(paymentId, method, status, paymentData);
@@ -46,6 +50,14 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         return digitCount == 8;
+    }
+
+    private boolean isValidBankTransfer(Map<String, String> paymentData) {
+        String bankName = paymentData.get("bankName");
+        String referenceNumber = paymentData.get("referenceNumber");
+
+        return bankName != null && !bankName.isBlank() &&
+                referenceNumber != null && !referenceNumber.isBlank();
     }
 
     @Override
