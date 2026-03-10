@@ -86,22 +86,18 @@ class PaymentRepositoryTest {
     }
 
     @Test
-    void testFindAllByMethodIfMethodCorrect() {
+    void testFindAllIfExist() {
         for (Payment payment : payments) {
             paymentRepository.save(payment);
         }
 
-        List<Payment> paymentList = paymentRepository.findAllByMethod(
-                payments.get(1).getMethod());
+        List<Payment> paymentList = paymentRepository.findAll();
         assertEquals(2, paymentList.size());
     }
 
     @Test
-    void testFindAllByMethodIfAllLowercase() {
-        paymentRepository.save(payments.get(1));
-
-        List<Payment> paymentList = paymentRepository.findAllByMethod(
-                payments.get(1).getMethod().toLowerCase());
+    void testFindAllIfEmpty() {
+        List<Payment> paymentList = paymentRepository.findAll();
         assertTrue(paymentList.isEmpty());
     }
 }
