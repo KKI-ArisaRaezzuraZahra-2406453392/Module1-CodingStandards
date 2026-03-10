@@ -30,13 +30,7 @@ public class PaymentRepository {
         return null;
     }
 
-    public List<Payment> findAllByMethod(String author) {
-        List<Payment> result = new ArrayList<>();
-        for (Payment savedPayment : paymentData) {
-            if (savedPayment.getMethod().equals(author)) {
-                result.add(savedPayment);
-            }
-        }
-        return result;
+    public List<Payment> findAll() {
+        return new ArrayList<>(paymentData);
     }
 }
