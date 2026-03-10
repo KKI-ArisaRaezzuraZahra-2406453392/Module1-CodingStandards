@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
+import id.ac.ui.cs.advprog.eshop.enums.PaymentStatus;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.repository.PaymentRepository;
@@ -19,14 +20,32 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
         String paymentId = UUID.randomUUID().toString();
+        String status = PaymentStatus.REJECTED.getValue();
 
-        Payment payment = new Payment(paymentId, method, "SUCCESS", paymentData);
-
-        if(paymentRepository.findById(payment.getId()) == null) {
-            paymentRepository.save(payment);
-            return payment;
+        if (method.equals("VoucherCode")) {
+            String voucherCode = paymentData.get("voucherCode");
+            if (isValidVoucherCode(voucherCode)) {
+                status = PaymentStatus.SUCCESS.getValue();
+            }
         }
-        return null;
+
+        Payment payment = new Payment(paymentId, method, status, paymentData);
+        return paymentRepository.save(payment);
+    }
+
+    private boolean isValidVoucherCode(String voucherCode) {
+        if (voucherCode == null || voucherCode.length() != 16 || !voucherCode.startsWith("ESHOP")) {
+            return false;
+        }
+
+        int digitCount = 0;
+        for (char c : voucherCode.toCharArray()) {
+            if (Character.isDigit(c)) {
+                digitCount++;
+            }
+        }
+
+        return digitCount == 8;
     }
 
     @Override
