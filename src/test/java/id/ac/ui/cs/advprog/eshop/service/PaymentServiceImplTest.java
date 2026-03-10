@@ -66,6 +66,54 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    void testAddPaymentInvalidPaymentData() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("invalid-data", "ESHOP123456789101112");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(orders, "VoucherCode", paymentData);
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentVoucherCodeInvalidLength() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "ESHOP123456789101112");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(orders, "VoucherCode", paymentData);
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentVoucherCodeInvalidPrefix() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "TOKOE123456789");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(orders, "VoucherCode", paymentData);
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentVoucherCodeInvalidDigitCount() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "ESHOP12345ABCDEF");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(orders, "VoucherCode", paymentData);
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
     void testSetStatus() {
         Payment payment = payments.get(1);
         Payment newPayment = new Payment(payment.getId(), payment.getMethod(),
